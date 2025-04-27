@@ -1,1 +1,59 @@
+# Customer Segmentation using K-Means Clustering
 
+# Importing necessary libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+
+# Step 1: Load / Create the Dataset
+# Example transactional data
+data = {
+    'Purchase Frequency': [5, 12, 17, 23, 27, 35, 40, 43, 48, 50, 10, 15, 22, 33, 37, 45, 49, 53],
+    'Amount Spent': [500, 750, 800, 1350, 1600, 1950, 2100, 2250, 2450, 2600, 600, 850, 1300, 1800, 2000, 2300, 2500, 2700]
+}
+df = pd.DataFrame(data)
+
+print("Sample Data:")
+print(df.head())
+
+# Step 2: Preprocessing - Standardize the features
+scaler = StandardScaler()
+scaled_data = scaler.fit_transform(df)
+
+# Step 3: Apply K-Means Clustering
+# Choose the number of clusters (k)
+k = 3
+kmeans = KMeans(n_clusters=k, random_state=42)
+kmeans.fit(scaled_data)
+
+# Predict cluster for each customer
+df['Cluster'] = kmeans.labels_
+
+# Step 4: Evaluation - Silhouette Score
+silhouette_avg = silhouette_score(scaled_data, df['Cluster'])
+print("\nSilhouette Score:", silhouette_avg)
+
+# Step 5: Visualizing the Clusters
+plt.figure(figsize=(8, 6))
+sns.scatterplot(
+    x='Purchase Frequency', 
+    y='Amount Spent', 
+    hue='Cluster', 
+    palette='viridis', 
+    data=df,
+    s=100
+)
+plt.title('Customer Segments')
+plt.xlabel('Purchase Frequency')
+plt.ylabel('Amount Spent')
+plt.legend(title='Cluster')
+plt.grid(True)
+plt.show()
+
+# Step 6: Display final DataFrame
+print("\nClustered Customers:")
+print(df)
